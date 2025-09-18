@@ -74,70 +74,31 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Reservation Form Handling
-    const reservationForm = document.querySelector('.reservation-form form');
+    // Contact Form Handling
+    const contactForm = document.querySelector('.contact-form form');
 
-    reservationForm.addEventListener('submit', function(e) {
-        e.preventDefault();
+    if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
 
-        // Get form data
-        const formData = new FormData(this);
-        const data = Object.fromEntries(formData);
-
-        // Validate form
-        if (validateReservationForm(data)) {
-            // Show success message
-            showNotification('예약 신청이 완료되었습니다. 곧 연락드리겠습니다.', 'success');
-
-            // Reset form
-            this.reset();
-
-            // In a real application, you would send this data to a server
-            console.log('Reservation data:', data);
-        }
-    });
-
-    // Form Validation
-    function validateReservationForm(data) {
-        const { name, phone, date, time, guests } = data;
-
-        if (!name.trim()) {
-            showNotification('성함을 입력해주세요.', 'error');
-            return false;
-        }
-
-        if (!phone.trim()) {
-            showNotification('연락처를 입력해주세요.', 'error');
-            return false;
-        }
-
-        if (!date) {
-            showNotification('예약일을 선택해주세요.', 'error');
-            return false;
-        }
-
-        if (!time) {
-            showNotification('시간을 선택해주세요.', 'error');
-            return false;
-        }
-
-        if (!guests) {
-            showNotification('인원수를 선택해주세요.', 'error');
-            return false;
-        }
-
-        // Check if selected date is in the future
-        const selectedDate = new Date(date);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        if (selectedDate < today) {
-            showNotification('오늘 이후의 날짜를 선택해주세요.', 'error');
-            return false;
-        }
-
-        return true;
+            const messageField = this.querySelector('#message');
+            if (messageField && messageField.value.trim()) {
+                showNotification('문의해 주셔서 감사합니다. 빠른 시일 내에 연락드리겠습니다.', 'success');
+                this.reset();
+            } else {
+                showNotification('문의내용을 입력해주세요.', 'error');
+            }
+        });
     }
+
+    // Contact Functions
+    window.openPhoneCall = function() {
+        window.location.href = 'tel:02-1234-5678';
+    };
+
+    window.openKakaoTalk = function() {
+        showNotification('카카오톡 플러스친구에서 "PRIME HANWOO"를 검색해주세요.', 'info');
+    };
 
     // Notification System
     function showNotification(message, type = 'info') {
@@ -272,29 +233,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Set minimum date for reservation form to today
-    const dateInput = document.getElementById('date');
-    if (dateInput) {
-        const today = new Date().toISOString().split('T')[0];
-        dateInput.min = today;
-    }
+    // Contact message character counter
+    const messageField = document.getElementById('message');
+    if (messageField) {
+        messageField.addEventListener('input', function() {
+            const currentLength = this.value.length;
+            const maxLength = this.getAttribute('maxlength') || 500;
 
-    // Phone number formatting
-    const phoneInput = document.getElementById('phone');
-    if (phoneInput) {
-        phoneInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-
-            if (value.length >= 11) {
-                value = value.substring(0, 11);
-                value = value.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
-            } else if (value.length >= 7) {
-                value = value.replace(/(\d{3})(\d{4})/, '$1-$2');
-            } else if (value.length >= 3) {
-                value = value.replace(/(\d{3})/, '$1-');
+            // You could add a character counter here if needed
+            if (currentLength > maxLength * 0.9) {
+                this.style.borderColor = '#f44336';
+            } else {
+                this.style.borderColor = '';
             }
-
-            e.target.value = value;
         });
     }
 
